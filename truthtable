@@ -13,6 +13,8 @@ ab=0
 
 	
 for F in 'AB_BUS_AND.csv'\
+ 'AB_BUS_ZERO.csv'\
+ 'AB_BUS_NEG.csv'\
  'AB_BUS_B.csv'\
  'AB_BUS_A.csv'\
  'AB_BUS_NOT_B.csv'\
@@ -27,6 +29,8 @@ for F in 'AB_BUS_AND.csv'\
  'AB_BUS_ADDC_SATURATE.csv'\
  'AB_BUS_SUBC.csv'\
  'AB_BUS_SUBC_LIMIT.csv'\
+ 'AB_BUS_ADDC_A_NOT_B.csv'\
+ 'AB_BUS_ADDC_NOT_A_B.csv'\
  'AB_BUS_AGTE.csv'\
  'AB_BUS_BIT0_B.csv'\
  'AB_BUS_BIT1_B.csv'\
@@ -67,13 +71,13 @@ for F in 'AB_BUS_AND.csv'\
 				printf -v b "%02x" "${B}"
 				
 				case ${F} in
-				'AB_BUS_B.csv')
-						printf -v y "%02x" "$(( B ))"
-						y="1${y: -1}" 
-						if [[ ${A} -eq ${B} ]]
-							then ab=1
-						else ab=0
-						fi
+				'AB_BUS_ZERO.csv')
+						y="10"
+						c=1 
+						;;
+				'AB_BUS_NEG.csv')
+						y="1f"
+						c=0 
 						;;
 				'AB_BUS_A.csv')
 						printf -v y "%02x" "$(( A ))"
@@ -147,6 +151,22 @@ for F in 'AB_BUS_AND.csv'\
 						;;
 				'AB_BUS_ADDC.csv')
 						printf -v y "%02x" "$(( A + B + !C ))"
+						[[ ${y:0:1} -eq 1 ]] && c=0 || c=1
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						;;
+				'AB_BUS_ADDC_A_NOT_B.csv')
+						printf -v y "%02x" "$(( A + !B + !C ))"
+						[[ ${y:0:1} -eq 1 ]] && c=0 || c=1
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						;;
+				'AB_BUS_ADDC_NOT_A_B.csv')
+						printf -v y "%02x" "$(( !A + B + !C ))"
 						[[ ${y:0:1} -eq 1 ]] && c=0 || c=1
 						if [[ ${A} -eq ${B} ]]
 							then ab=1
