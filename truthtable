@@ -1,6 +1,6 @@
 #!/bin/bash
 	#Different codes here to set carry out. Logical operations always 0
-#c=0
+c=0
 
 	#Operations to set P output
 p=0
@@ -18,22 +18,43 @@ for F in 'AB_BUS_AND.csv'\
  'AB_BUS_NOT_B.csv'\
  'AB_BUS_NOT_A.csv'\
  'AB_BUS_AND.csv'\
+ 'AB_BUS_NAND.csv'\
  'AB_BUS_OR.csv'\
+ 'AB_BUS_NOR.csv'\
  'AB_BUS_XOR.csv'\
+ 'AB_BUS_XNOR.csv'\
  'AB_BUS_ADDC.csv'\
  'AB_BUS_SUBC.csv'\
  'AB_BUS_AGTE.csv'\
- 'AB_BUS_BIT0.csv'\
- 'AB_BUS_BIT1.csv'\
- 'AB_BUS_BIT2.csv'\
- 'AB_BUS_BIT3.csv'\
+ 'AB_BUS_BIT0_B.csv'\
+ 'AB_BUS_BIT1_B.csv'\
+ 'AB_BUS_BIT2_B.csv'\
+ 'AB_BUS_BIT3_B.csv'\
+ 'AB_BUS_BIT0_B_CHG.csv'\
+ 'AB_BUS_BIT1_B_CHG.csv'\
+ 'AB_BUS_BIT2_B_CHG.csv'\
+ 'AB_BUS_BIT3_B_CHG.csv'\
+ 'AB_BUS_BIT0_A.csv'\
+ 'AB_BUS_BIT1_A.csv'\
+ 'AB_BUS_BIT2_A.csv'\
+ 'AB_BUS_BIT3_A.csv'\
+ 'AB_BUS_BIT0_A_CHG.csv'\
+ 'AB_BUS_BIT1_A_CHG.csv'\
+ 'AB_BUS_BIT2_A_CHG.csv'\
+ 'AB_BUS_BIT3_A_CHG.csv'\
  'AB_BUS_MUL_L.csv'\
  'AB_BUS_MUL_H.csv'\
  'AB_BUS_NOT_A_OR_B.csv'\
  'AB_BUS_NOT_A_AND_B.csv'\
  'AB_BUS_NOT_A_XOR_B.csv'\
- 'AB_BUS_NOR.csv'\
- ;do
+ 'AB_BUS_A_OR_NOT_B.csv'\
+ 'AB_BUS_A_AND_NOT_B.csv'\
+ 'AB_BUS_A_XOR_NOT_B.csv'\
+ 'AB_BUS_LSL_A.csv'\
+ 'AB_BUS_LSR_A.csv'\
+ 'AB_BUS_LSL_B.csv'\
+ 'AB_BUS_LSR_B.csv'\
+;do
 
 	echo "Carry_In,A_Bus,B_Bus,Y Out,Carry_Out,A_EQ_B,P,G" > ${F}
 	
@@ -97,6 +118,31 @@ for F in 'AB_BUS_AND.csv'\
 						else ab=0
 						fi
 						;;
+				'AB_BUS_XNOR.csv')
+						printf -v y "%02x" "$(( $(( A ^ B )) ^ -1 ))"
+						#echo "$A $B $y"
+						y=0${y: -1}
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						;;
+				'AB_BUS_NOR.csv')
+						printf -v y "%02x" "$(( $(( A | B )) ^ -1))"
+						y=0${y: -1}
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						;;
+				'AB_BUS_NAND.csv')
+						printf -v y "%02x" "$(( $(( A & B )) ^ -1 ))"
+						y="0${y: -1}"
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						;;
 				'AB_BUS_ADDC.csv')
 						printf -v y "%02x" "$(( A + B + !C ))"
 						[[ ${y:0:1} -eq 1 ]] && c=0 || c=1
@@ -120,24 +166,64 @@ for F in 'AB_BUS_AND.csv'\
 						printf -v y "%02x" "$(( ${B} ))"
 						[[ B -ge A ]] && ab=0 || ab=1
 						;;
-				'AB_BUS_BIT0.csv')
+				'AB_BUS_BIT0_B.csv')
 						printf -v y "%02x" "$(( ${B} ))"
+						ab=$(( B & 1 ))
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT1_B.csv')
+						printf -v y "%02x" "$(( ${B} ))"
+						ab=$(( B & 2 ))
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT2_B.csv')
+						printf -v y "%02x" "$(( ${B} ))"
+						ab=$(( B & 4 ))
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT3_B.csv')
+						printf -v y "%02x" "$(( ${B} ))"
+						ab=$(( B & 8 ))
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT0_A.csv')
+						printf -v y "%02x" "$(( ${A} ))"
 						ab=$(( A & 1 ))
 						[[ ab -gt 0 ]] && ab=1 || ab=0
 						;;
-				'AB_BUS_BIT1.csv')
-						printf -v y "%02x" "$(( ${B} ))"
+				'AB_BUS_BIT1_A.csv')
+						printf -v y "%02x" "$(( ${A} ))"
 						ab=$(( A & 2 ))
 						[[ ab -gt 0 ]] && ab=1 || ab=0
 						;;
-				'AB_BUS_BIT2.csv')
-						printf -v y "%02x" "$(( ${B} ))"
+				'AB_BUS_BIT2_A.csv')
+						printf -v y "%02x" "$(( ${A} ))"
 						ab=$(( A & 4 ))
 						[[ ab -gt 0 ]] && ab=1 || ab=0
 						;;
-				'AB_BUS_BIT3.csv')
-						printf -v y "%02x" "$(( ${B} ))"
+				'AB_BUS_BIT3_A.csv')
+						printf -v y "%02x" "$(( ${A} ))"
 						ab=$(( A & 8 ))
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT0_B_CHG.csv')
+						ab=$(( B & 1 ))
+						printf -v y "%02x" "$(( $(( ${B} )) ^ 1 ))"
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT1_B_CHG.csv')
+						ab=$(( B & 2 ))
+						printf -v y "%02x" "$(( $(( ${B} )) ^ 2 ))"
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT2_B_CHG.csv')
+						ab=$(( B & 4 ))
+						printf -v y "%02x" "$(( $(( ${B} )) ^ 4 ))"
+						[[ ab -gt 0 ]] && ab=1 || ab=0
+						;;
+				'AB_BUS_BIT3_B_CHG.csv')
+						ab=$(( B & 8 ))
+						printf -v y "%02x" "$(( $(( ${B} )) ^ 8 ))"
 						[[ ab -gt 0 ]] && ab=1 || ab=0
 						;;
 				'AB_BUS_MUL_L.csv')
@@ -178,19 +264,67 @@ for F in 'AB_BUS_AND.csv'\
 						else ab=0
 						fi
 						;;
-				'AB_BUS_NOR.csv')
-						printf -v y "%02x" "$(( A | B ))"
-						y=~${y: -0}
+				'AB_BUS_A_OR_NOT_B.csv')
+						printf -v y "%02x" "$(( A | ~B ))"
+						y="!${y: -1}" 
 						if [[ ${A} -eq ${B} ]]
 							then ab=1
 						else ab=0
 						fi
 						;;
-				'AB_BUS_f004.csv')
-						printf -v y "%02x" "$(( ${A}^${A} ))"
+				'AB_BUS_A_AND_NOT_B.csv')
+						printf -v y "%02x" "$(( A & ~B ))"
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
 						;;
-				'AB_BUS_f005.csv')
-						printf -v y "%02x" "$(( ${A}^${A} ))"
+				'AB_BUS_A_XOR_NOT_B.csv')
+						printf -v y "%02x" "$(( A ^ ~B ))"
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						;;
+				'AB_BUS_LSL_A.csv')
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						printf -v y "%02x" "$(( $(( ${A} << 1 )) | C ))"
+						y=${y: -0}
+						c=${y:0:1}
+						#[[ c -gt 0 ]] && c=1 || c=0
+						;;
+				'AB_BUS_LSR_A.csv')
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						printf -v y "%02x" "$(( $(( ${A} >> 1 )) | $(( C << 3 )) ))"
+						y=${y: -0}
+						c=$(( A & 1 ))
+						#[[ c -gt 0 ]] && c=1 || c=0
+						;;
+				'AB_BUS_LSL_B.csv')
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						printf -v y "%02x" "$(( $(( ${B} << 1 )) | C ))"
+						y=${y: -0}
+						c=${y:0:1}
+						#[[ c -gt 0 ]] && c=1 || c=0
+						;;
+				'AB_BUS_LSR_B.csv')
+						if [[ ${A} -eq ${B} ]]
+							then ab=1
+						else ab=0
+						fi
+						printf -v y "%02x" "$(( $(( ${B} >> 1 )) | $(( C << 3 )) ))"
+						y=${y: -0}
+						c=$(( A & 1 ))
+						#[[ c -gt 0 ]] && c=1 || c=0
 						;;
 				'AB_BUS_f006.csv')
 						printf -v y "%02x" "$(( ${A}^${A} ))"
